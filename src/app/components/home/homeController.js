@@ -19,14 +19,16 @@ function homeController($scope, loadData, $http) {
                 fourSquare.then(function (fData) {
                     fourSquareData = fData.response.venues;
                     if (fourSquareData.length < 1) {
-                        return;             // No result found.
+                        $('#loader').hide();
+                        return false;             // No result found.
                     }
                     var combinedData = _.merge(yelpData, fourSquareData);
                     if (yData == 404) combinedData = fourSquareData;
-                    for (var i = 0; i < combinedData.length; i++) {
+                    console.log('combinedData',combinedData)
+                    for (var i in combinedData) {
                         image = combinedData[i].image_url !== undefined ? combinedData[i].image_url : noPreviewImg;
                         var contact = combinedData[i].contact ? combinedData[i].contact : 'Not available';
-                        var twitter = combinedData[i].contact.twitter ? combinedData[i].contact.twitter : 'Not available';
+                        var twitter = combinedData[i].contact ? combinedData[i].contact.twitter : 'Not available';
                         var url = combinedData[i].url ? combinedData[i].url : 'Not available';
                         var rating = combinedData[i].rating ? combinedData[i].rating : 'Not available';
                         $scope.output.push({
@@ -42,7 +44,7 @@ function homeController($scope, loadData, $http) {
                     }
                     if ($scope.output.length > 25) $scope.output.length = 25;
                     loadMap($scope.output[0].location.lat, $scope.output[0].location.lng, 14);
-                    $('.preloader-wrapper').hide();
+                    $('#loader').hide();
                     addMarker();
                 });
             });
