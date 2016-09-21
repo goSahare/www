@@ -46,8 +46,8 @@ function homeController($scope, loadData, $http) {
                     addMarker();
                 });
             });
+            $scope.area = $scope.term = undefined;                     //Reinitialise inputbox text for next click.
         }
-        $scope.area = $scope.term = undefined;                     //Reinitialise inputbox text for next click.
     };
 
     function getImageFourSquare(id) {
