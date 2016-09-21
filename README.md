@@ -1,9 +1,7 @@
-"# www" 
-
 Search for anything
 Find the best place to eat, drink, shop, or visit in any city in the world.
 
-Prequisite 
+Prerequisite
   node gulp install on machine
 
 Steps to run 
