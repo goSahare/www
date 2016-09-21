@@ -1,8 +1,8 @@
 function homeController($scope, loadData, $http) {
     var _ = require('lodash');
-    var yelp, map, fourSquare, geoLat, geoLng, infowindow, venueImage, yelpData, fourSquareData;
-    var image;
+    var yelp, map, fourSquare, geoLat, geoLng, infowindow, venueImage, yelpData, fourSquareData, image;
     var imageSize = '120x120';
+    var noPreviewImg = 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTEiepekCgiyH7usEO-x2k6WqQnlgrW5dRpyXvmW85FuoYpmUse';
 
     loadMap(18.31, 73.85, 6); //Location over India by default.
     $('#loader').hide();
@@ -24,10 +24,10 @@ function homeController($scope, loadData, $http) {
                     var combinedData = _.merge(yelpData, fourSquareData);
                     if (yData == 404) combinedData = fourSquareData;
                     for (var i = 0; i < combinedData.length; i++) {
-                        image = combinedData[i].image_url !== undefined ? combinedData[i].image_url : getImageFourSquare(fourSquareData[i].id);
+                        image = combinedData[i].image_url !== undefined ? combinedData[i].image_url : noPreviewImg;
                         var contact = combinedData[i].contact ? combinedData[i].contact : 'Not available';
                         var twitter = combinedData[i].contact.twitter ? combinedData[i].contact.twitter : 'Not available';
-                        var url = combinedData[i].url? combinedData[i].url : 'Not available';
+                        var url = combinedData[i].url ? combinedData[i].url : 'Not available';
                         var rating = combinedData[i].rating ? combinedData[i].rating : 'Not available';
                         $scope.output.push({
                             id: combinedData[i].id,
@@ -48,6 +48,7 @@ function homeController($scope, loadData, $http) {
             });
             $scope.area = $scope.term = undefined;                     //Reinitialise inputbox text for next click.
         }
+
     };
 
     function getImageFourSquare(id) {
