@@ -6,7 +6,7 @@ Find the best place to eat, drink, shop, or visit in any city in the world.
 Prequisite 
   node gulp install on machine
 
-Steps to rum 
+Steps to run 
 $ npm install
 $ npm install gulp
 $ gulp 
