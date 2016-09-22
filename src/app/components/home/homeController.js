@@ -3,16 +3,21 @@ function homeController($scope, loadData, $http) {
     var yelp, map, fourSquare, geoLat, geoLng, infowindow, venueImage, yelpData, fourSquareData, image;
     var imageSize = '120x120';
     var noPreviewImg = 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTEiepekCgiyH7usEO-x2k6WqQnlgrW5dRpyXvmW85FuoYpmUse';
+    var index = 0;
 
     loadMap(18.31, 73.85, 6); //Location over India by default.
     $('#loader').hide();
+
+    function handleCb(data) {
+        return data;
+    }
 
     $scope.showResult = function () {
         $scope.output = [];
         if (($scope.area !== undefined) && ($scope.term !== undefined)) {
             $('#loader').show();
             $scope.area = $scope.area.split(',')[0];
-            yelp = loadData.fetchYelp($scope.area, $scope.term);
+            yelp = loadData.fetchYelp($scope.area, $scope.term, handleCb(index));
             fourSquare = loadData.fetchFourSquare($scope.area, $scope.term);
             yelp.then(function (yData) {
                 yelpData = yData.businesses;
@@ -20,15 +25,15 @@ function homeController($scope, loadData, $http) {
                     fourSquareData = fData.response.venues;
                     if (fourSquareData.length < 1) {
                         $('#loader').hide();
-                        return false;             // No result found.
+                        return;             // No result found.
                     }
                     var combinedData = _.merge(yelpData, fourSquareData);
+
                     if (yData == 404) combinedData = fourSquareData;
-                    console.log('combinedData',combinedData)
                     for (var i in combinedData) {
                         image = combinedData[i].image_url !== undefined ? combinedData[i].image_url : noPreviewImg;
                         var contact = combinedData[i].contact ? combinedData[i].contact : 'Not available';
-                        var twitter = combinedData[i].contact ? combinedData[i].contact.twitter : 'Not available';
+                        var twitter = combinedData[i].contact.twitter ? combinedData[i].contact.twitter : 'Not available';
                         var url = combinedData[i].url ? combinedData[i].url : 'Not available';
                         var rating = combinedData[i].rating ? combinedData[i].rating : 'Not available';
                         $scope.output.push({
@@ -42,6 +47,7 @@ function homeController($scope, loadData, $http) {
                             image: image
                         });
                     }
+                    index++;
                     if ($scope.output.length > 25) $scope.output.length = 25;
                     loadMap($scope.output[0].location.lat, $scope.output[0].location.lng, 14);
                     $('#loader').hide();
@@ -57,7 +63,7 @@ function homeController($scope, loadData, $http) {
         $http.get('https://api.foursquare.com/v2/venues/' + id + '/photos?oauth_token=UYJI4JL3SA3GCJXYKPOJFK3NWEAIOPRBK1AMS4XBQTFP2U3F&v=20160919')
             .success(function (data) {
                 var imageData = data.response.photos.items[0];
-                return image = imageData ? imageData.prefix + imageSize + imageData.suffix : '';
+                image = imageData ? imageData.prefix + imageSize + imageData.suffix : '';
             });
     }
 
@@ -100,6 +106,7 @@ function homeController($scope, loadData, $http) {
 
     $scope.getLocation = function () {
         $('#locality').focus();
+
         navigator.geolocation.getCurrentPosition(function (location) {
             geoLat = location.coords.latitude;
             geoLng = location.coords.longitude;
