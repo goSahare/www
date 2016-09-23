@@ -2,32 +2,34 @@ function homeController($scope, loadData, $http) {
     var _ = require('lodash');
     var yelp, map, fourSquare, geoLat, geoLng, infowindow, venueImage, yelpData, fourSquareData, image;
     var imageSize = '120x120';
+    var area;
     var noPreviewImg = 'https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTEiepekCgiyH7usEO-x2k6WqQnlgrW5dRpyXvmW85FuoYpmUse';
-    var index = 0;
 
     loadMap(18.31, 73.85, 6); //Location over India by default.
     $('#loader').hide();
 
-    function handleCb(data) {
-        return data;
-    }
+    $scope.$watch('area', function () {
+         area = $scope.area;
+    }, true);
 
     $scope.showResult = function () {
         $scope.output = [];
-        if (($scope.area !== undefined) && ($scope.term !== undefined)) {
+        if ((area !== undefined) && ($scope.term !== undefined)) {
             $('#loader').show();
-            $scope.area = $scope.area.split(',')[0];
-            yelp = loadData.fetchYelp($scope.area, $scope.term, handleCb(index));
-            fourSquare = loadData.fetchFourSquare($scope.area, $scope.term);
+            area = area.split(',')[0];
+            Materialize.toast(_.upperFirst($scope.term) + "s in " + _.upperFirst(area), 5000);
+            yelp = loadData.fetchYelp(area, $scope.term);
+            fourSquare = loadData.fetchFourSquare(area, $scope.term);
             yelp.then(function (yData) {
                 yelpData = yData.businesses;
                 fourSquare.then(function (fData) {
                     fourSquareData = fData.response.venues;
                     if (fourSquareData.length < 1) {
                         $('#loader').hide();
-                        return;             // No result found.
+                        return false;             // No result found.
                     }
                     var combinedData = _.merge(yelpData, fourSquareData);
+
 
                     if (yData == 404) combinedData = fourSquareData;
                     for (var i in combinedData) {
@@ -47,7 +49,6 @@ function homeController($scope, loadData, $http) {
                             image: image
                         });
                     }
-                    index++;
                     if ($scope.output.length > 25) $scope.output.length = 25;
                     loadMap($scope.output[0].location.lat, $scope.output[0].location.lng, 14);
                     $('#loader').hide();
@@ -62,8 +63,8 @@ function homeController($scope, loadData, $http) {
     function getImageFourSquare(id) {
         $http.get('https://api.foursquare.com/v2/venues/' + id + '/photos?oauth_token=UYJI4JL3SA3GCJXYKPOJFK3NWEAIOPRBK1AMS4XBQTFP2U3F&v=20160919')
             .success(function (data) {
-                var imageData = data.response.photos.items[0];
-                image = imageData ? imageData.prefix + imageSize + imageData.suffix : '';
+                var imageData = data ? data.response.photos.items[0] : '';
+                var abc = data ? imageData.prefix + imageSize + imageData.suffix : '';
             });
     }
 
