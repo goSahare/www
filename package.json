@@ -1,7 +1,7 @@
 {
   "name": "www",
   "version": "1.0.0",
-  "description": "mathletics monday",
+  "description": "w3search",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
